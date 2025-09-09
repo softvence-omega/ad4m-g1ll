@@ -6,7 +6,7 @@ const HomeButton = ({ onClick, title }: { onClick?: () => void; title: string })
     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
       <button
         onClick={onClick}
-        className="hover:bg-text-primary hover:border-text-primary group flex w-full cursor-pointer items-center justify-between gap-4 rounded-full border border-[#7E7E7E] bg-white px-6 py-2 text-sm font-semibold text-[#7E7E7E] hover:text-white md:w-fit md:text-xl"
+        className="hover:bg-text-primary hover:border-text-primary group flex w-full cursor-pointer items-center justify-between gap-4 rounded-full border border-[#7E7E7E] py-2 pr-4 pl-6 text-sm font-semibold text-[#7E7E7E] hover:text-white md:w-fit md:text-xl"
       >
         {title}
 
