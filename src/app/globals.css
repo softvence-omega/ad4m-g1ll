@@ -11,12 +11,20 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-grotesk-font: "Familjen Grotesk", sans-serif;
+  --font-custom-font: "CustomFont", sans-serif;
   --font-roboto-font: "Roboto", sans-serif;
   --color-text-primary: #004cf9;
   --color-text-secondary: #c40e44;
   --color-text-tertiary: #7f2484;
 }
-
+@font-face {
+  font-family: "CustomFont";
+  src:
+    url("/font/grotesk.otf") format("woff2"),
+    url("/font/grotesk.otf") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
 body {
   background: var(--background);
   color: var(--foreground);
