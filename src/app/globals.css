@@ -1,0 +1,24 @@
+@import "tailwindcss";
+/* @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400..700;1,400..700&display=swap'); */
+:root {
+  --background: #ffffff;
+  --foreground: #000;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-grotesk-font: "Familjen Grotesk", sans-serif;
+  --font-roboto-font: "Roboto", sans-serif;
+  --color-text-primary: #004cf9;
+  --color-text-secondary: #c40e44;
+  --color-text-tertiary: #7f2484;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Roboto", sans-serif;
+}
