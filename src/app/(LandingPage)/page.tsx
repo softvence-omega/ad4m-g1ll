@@ -4,19 +4,20 @@ import BannerBottom from "@/components/features/landingPage/Banner/BannerBottom"
 import BenefitsSection from "@/components/features/landingPage/Benefits/BenefitSeciton";
 import FaqSection from "@/components/features/landingPage/FAQSection";
 
+import ScrollStackSection from "@/components/features/landingPage/ScrollStack/ScrollStackSection";
 import WhyChooseUs from "@/components/features/landingPage/WhyChooseUs/WhyChooseUs";
 
 export default function Home() {
   return (
-    <div>
+    <div className="">
       <Banner />
       <BannerBottom />
-    <div className="">
+      <ScrollStackSection />
+
       <AboutSection />
       <BenefitsSection />
       <FaqSection />
       <WhyChooseUs />
-    </div>
     </div>
   );
 }
