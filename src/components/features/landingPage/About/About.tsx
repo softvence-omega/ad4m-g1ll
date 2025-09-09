@@ -8,7 +8,7 @@ const vdo = "/landingPage/about.mp4";
 export default function AboutSection() {
   return (
     <Wrapper>
-      <div className="flex flex-col justify-between md:gap-16 lg:flex-row">
+      <div className="flex flex-col justify-between py-20 md:gap-16 lg:flex-row">
         <motion.div
           style={{
             backgroundImage: `url('/landingPage/aboutBox.png')`,
@@ -108,7 +108,7 @@ export default function AboutSection() {
             style={{
               transform: "scaleX(-1)",
             }}
-            className="z-10 justify-end md:mt-20 md:flex"
+            className="z-10 mt-20 justify-end md:flex"
           >
             <HomeButton title="Contact" />
           </div>
