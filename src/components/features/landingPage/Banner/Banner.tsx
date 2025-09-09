@@ -67,7 +67,6 @@ function Banner() {
             <FaLinkedinIn size={20} />
             </a>
        </div>
-
     </section>
   );
 }
