@@ -3,6 +3,9 @@ import BenefitsSection from "@/components/features/landingPage/Benefits/BenefitS
 
 export default function Home() {
   return (
+
+    <div >
+      <Banner />
     <div className="">
       <AboutSection />
       <BenefitsSection />
