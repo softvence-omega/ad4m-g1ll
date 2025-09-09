@@ -50,9 +50,9 @@ export default function Navbar() {
         {/* Desktop Contact Button */}
         <div className="hidden md:block">
           <Link
-            href="/contact"
+            href="/Contacts"
             className={`flex items-center space-x-2 rounded-full px-4 py-2 text-sm font-medium shadow-md transition ${
-              pathname === "/contact"
+              pathname === "/Contacts"
                 ? "bg-blue-600 text-white hover:bg-blue-700"
                 : "border border-gray-300 text-gray-700 bg-white/10"
             }`}
@@ -94,10 +94,10 @@ export default function Navbar() {
 
           {/* Mobile Contact Button */}
           <Link
-            href="/contact"
+            href="/Contacts"
             onClick={() => setIsOpen(false)}
             className={`flex items-center justify-center space-x-2 rounded-full px-4 py-2 text-sm font-medium shadow-md transition w-full ${
-              pathname === "/contact"
+              pathname === "/Contacts"
                 ? "bg-blue-600 text-white hover:bg-blue-700"
                 : "border border-gray-300 text-gray-700 hover:bg-gray-100"
             }`}
