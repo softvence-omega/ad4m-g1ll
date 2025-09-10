@@ -1,30 +1,37 @@
+import Wrapper from "@/components/reusable/Wrapper";
 import { benefits } from "@/lib/data";
+import BenefitCard from "./BenefitCard";
 
 const BenefitsSection = () => {
   return (
-    <section className="bg-gradient-to-r from-blue-100 to-pink-100 px-6 py-12">
-      <div className="mx-auto text-center">
-        <h2 className="font-custom-font mb-6 text-3xl font-semibold text-red-600">
-          Benefits of Our Services
-        </h2>
-        <p className="mb-12 text-lg text-gray-700">
-          By partnering with NXD, your organisation will experience several benefits, including:
-        </p>
-        <div className="flex flex-wrap justify-center gap-8">
-          {benefits.map((benefit, index) => (
-            <div
-              key={index}
-              className="flex w-full flex-col items-center gap-4 rounded-xl bg-white p-6 shadow-lg sm:w-72 lg:w-80"
-            >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
-                {benefit.icon}
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800">{benefit.title}</h3>
-              <p className="text-gray-600">{benefit.description}</p>
-            </div>
-          ))}
+    <section
+      style={{
+        backgroundImage: `url('/landingPage/benefits.png')`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+      }}
+      className="py-25"
+    >
+      <Wrapper>
+        <div className="text-center">
+          <h2 className="mb-6 text-4xl font-bold text-red-600 md:text-[36px]">
+            Benefits of Our Services
+          </h2>
+          <p className="mb-12 text-lg text-[#454F5B]">
+            By partnering with NXD, your organisation will experience several benefits, including:
+          </p>
+          <div className="mt-20 flex flex-wrap justify-center gap-6">
+            {benefits.slice(0, 2).map((benefit, index) => (
+              <BenefitCard key={index} benefit={benefit} index={index} />
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap justify-center gap-6 md:mt-15">
+            {benefits.slice(2, 5).map((benefit, index) => (
+              <BenefitCard key={index} benefit={benefit} index={index} />
+            ))}
+          </div>
         </div>
-      </div>
+      </Wrapper>
     </section>
   );
 };
