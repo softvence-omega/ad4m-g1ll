@@ -5,7 +5,7 @@ function Banner() {
   const vdo = "/landingPage/about.mp4";
 
   return (
-    <section className="border-b border-gray-300 relative w-full bg-white h-[300px] sm:h-[400px] md:h-[500px] lg:h-[880px] overflow-hidden">
+    <section className=" lg:border-b md:border-b border-gray-300 relative w-full bg-white h-[300px] sm:h-[400px] md:h-[500px] lg:h-[880px] overflow-hidden">
       <div className="flex flex-col md:flex-row h-full w-full relative z-10 font-custom-font">
         {/* Left content */}
         <div
@@ -31,12 +31,12 @@ function Banner() {
               ></video>
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-[160px] font-extrabold text-[#C40E44] leading-tight text-center md:text-left ml-4">
+            <h1 className="text-2xl md:text-7xl lg:text-[160px] font-extrabold text-[#C40E44] leading-tight text-center md:text-left ml-4">
               Intelligent
             </h1>
           </div>
 
-          <h1 className="text-5xl md:text-5xl lg:text-[160px] font-extrabold leading-tight text-black text-center md:text-left">
+          <h1 className="text-2xl md:text-5xl lg:text-[160px] font-extrabold leading-tight text-black text-center md:text-left">
             processes and <span className="text-blue-600">Automation</span>
           </h1>
         </div>
