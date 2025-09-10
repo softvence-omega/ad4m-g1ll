@@ -26,7 +26,7 @@ function WhatToDo() {
     <section className="py-16 bg-[#F6F6F6]">
       <div className="container mx-auto px-4 text-center">
         {/* Title */}
-        <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-6">
+        <h2 className="text-4xl md:text-4xl font-bold text-text-primary font-custom-font mb-6">
           What We Do
         </h2>
 

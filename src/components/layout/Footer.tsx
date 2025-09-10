@@ -16,7 +16,6 @@ export function Footer() {
               {/* Logo */}
               <div className="flex items-center space-x-2">
                 <Image src={logo} alt="NXDI Logo" width={100} height={32} />
-                <span className="text-xl font-medium text-blue-900">NXDI</span>
               </div>
 
               {/* Email Subscription and Socials */}
@@ -107,12 +106,13 @@ export function Footer() {
 
       {/* "Go Top" Button */}
       <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="hidden md:flex flex-col items-center justify-center w-12 h-20 rounded-t-lg absolute bottom-0 right-8 transform -translate-y-1/2 bg-gray-300 text-gray-700 shadow-md transition-colors hover:bg-gray-400"
-      >
-        <ArrowUp size={20} />
-        <span className="text-xs mt-1">Go Top</span>
-      </button>
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className=" md:flex items-center justify-center px-10 py-5 rounded-full border border-gray-400 bg-white text-gray-700 shadow hover:bg-gray-100 transition-colors absolute bottom-10 right-6"
+      style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+    >
+      <ArrowUp size={18} className="mx-auto mb-1" />
+      <span className="text-sm">Go Top</span>
+    </button>
     </footer>
   );
 }

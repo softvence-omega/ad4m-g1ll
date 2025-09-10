@@ -5,20 +5,38 @@ import BenefitsSection from "@/components/features/landingPage/Benefits/BenefitS
 import FaqSection from "@/components/features/landingPage/FAQSection";
 import ScrollStack from "@/components/features/landingPage/ScrollStack/ScrollStack";
 import WhatToDo from "@/components/features/landingPage/WhatToDo";
-
 import WhyChooseUs from "@/components/features/landingPage/WhyChooseUs/WhyChooseUs";
 
 export default function Home() {
   return (
-    <div className="">
-      <Banner />
+    <div>
+      <section id="home">
+        <Banner />
+      </section>
+
       <BannerBottom />
-       <WhatToDo/>
+
+      <section id="services">
+        <WhatToDo />
+      </section>
+
       <ScrollStack />
-      <AboutSection />
-      <BenefitsSection />
-      <FaqSection />
-      <WhyChooseUs />
+
+      <section id="about">
+        <AboutSection />
+      </section>
+
+      <section id="benefits">
+        <BenefitsSection />
+      </section>
+
+      <section id="faq">
+        <FaqSection />
+      </section>
+
+      <section id="whyus">
+        <WhyChooseUs />
+      </section>
     </div>
   );
 }
