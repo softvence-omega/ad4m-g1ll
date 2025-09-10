@@ -92,12 +92,12 @@ const ScrollStack: React.FC = () => {
   return (
     <section
       ref={scrollableSectionRef}
-      className="scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300 scrollbar-hidden relative max-h-[140dvh] w-full lg:max-h-[100dvh]"
+      className="scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300 scrollbar-hidden relative max-h-[140dvh] w-full xl:max-h-[100dvh]"
     >
-      <div ref={sectionRef} className="relative h-[155dvh] lg:h-[205dvh]">
+      <div ref={sectionRef} className="relative h-[155dvh] xl:h-[205dvh]">
         <div className="sticky top-0 flex w-full items-center justify-center overflow-hidden">
           <div className="mx-auto flex h-full w-full flex-col justify-center">
-            <div className="relative mx-auto h-[150dvh] w-full lg:h-[100dvh]">
+            <div className="relative mx-auto h-[150dvh] w-full xl:h-[100dvh]">
               {/* Static ScrollStackItem for "We Mine" */}
               <div
                 className={`absolute z-50 overflow-hidden shadow-xl transition-all duration-300`}
@@ -111,12 +111,12 @@ const ScrollStack: React.FC = () => {
                   pointerEvents: getCardTransform(0)?.pointerEvents,
                 }}
               >
-                <div className="bg-text-tertiary w-full rounded-t-lg">
+                <div className="bg-text-tertiary w-full rounded-t-xl">
                   <Wrapper>
-                    <div className="flex w-full flex-col justify-between gap-20 py-20 lg:flex-row lg:items-center">
-                      <div className="text-white lg:w-1/2">
-                        <h2 className="mb-6 text-2xl font-bold lg:text-[32px]">We Mine</h2>
-                        <p className="mb-8 lg:text-lg">
+                    <div className="flex w-full flex-col justify-between gap-20 py-20 xl:flex-row xl:items-center">
+                      <div className="text-white xl:w-1/2">
+                        <h2 className="mb-6 text-2xl font-bold xl:text-[32px]">We Mine</h2>
+                        <p className="mb-8 xl:text-xl">
                           Process mining provides organisations with deep, data-driven insights into
                           their operational workflows by systematically analysing system data.
                           Through a structured and meticulous evaluation of system events, NXDI
@@ -138,11 +138,11 @@ const ScrollStack: React.FC = () => {
                           Read More
                         </a>
                       </div>
-                      <div className="lg:w-1/2">
+                      <div className="xl:w-1/2">
                         <Image
                           src={img1}
                           alt="We Mine"
-                          className="hidden h-[60dvh] w-full rounded-lg object-cover md:block"
+                          className="hidden h-[60dvh] w-full rounded-xl object-cover md:block"
                         />
                       </div>
                     </div>
@@ -163,12 +163,12 @@ const ScrollStack: React.FC = () => {
                   pointerEvents: getCardTransform(1).pointerEvents,
                 }}
               >
-                <div className="bg-text-primary w-full rounded-t-lg">
+                <div className="bg-text-primary w-full rounded-t-xl">
                   <Wrapper>
-                    <div className="flex w-full flex-col justify-between gap-20 py-20 lg:flex-row lg:items-center">
-                      <div className="text-white lg:w-1/2">
-                        <h2 className="mb-6 text-2xl font-bold lg:text-[32px]">We Improve</h2>
-                        <p className="mb-8 lg:text-lg">
+                    <div className="flex w-full flex-col justify-between gap-20 py-20 xl:flex-row xl:items-center">
+                      <div className="text-white xl:w-1/2">
+                        <h2 className="mb-6 text-2xl font-bold xl:text-[32px]">We Improve</h2>
+                        <p className="mb-8 xl:text-xl">
                           Enhancing operational efficiency requires a structured and strategic
                           approach to process improvement. At NXDI, we work in close partnership
                           with your organisation to identify inefficiencies, address operational
@@ -190,11 +190,11 @@ const ScrollStack: React.FC = () => {
                           Read More
                         </a>
                       </div>
-                      <div className="lg:w-1/2">
+                      <div className="xl:w-1/2">
                         <Image
                           src={img2}
                           alt="We Improve"
-                          className="hidden h-[60dvh] w-full rounded-lg object-cover md:block"
+                          className="hidden h-[60dvh] w-full rounded-xl object-cover md:block"
                         />
                       </div>
                     </div>
@@ -215,12 +215,12 @@ const ScrollStack: React.FC = () => {
                   pointerEvents: getCardTransform(2).pointerEvents,
                 }}
               >
-                <div className="bg-text-secondary w-full rounded-t-lg">
+                <div className="bg-text-secondary w-full rounded-t-xl">
                   <Wrapper>
-                    <div className="flex w-full flex-col justify-between gap-20 py-20 lg:flex-row lg:items-center">
-                      <div className="text-white lg:w-1/2">
-                        <h2 className="mb-6 text-2xl font-bold lg:text-[32px]">We Automate</h2>
-                        <p className="mb-8 lg:text-lg">
+                    <div className="flex w-full flex-col justify-between gap-20 py-20 xl:flex-row xl:items-center">
+                      <div className="text-white xl:w-1/2">
+                        <h2 className="mb-6 text-2xl font-bold xl:text-[32px]">We Automate</h2>
+                        <p className="mb-8 xl:text-xl">
                           Strategic automation is essential for organisations seeking to enhance
                           operational efficiency, optimise resources, and scale effectively. At
                           NXDI, we focus on assessing automation readiness, identifying high-impact
@@ -243,11 +243,11 @@ const ScrollStack: React.FC = () => {
                         </a>
                       </div>
 
-                      <div className="lg:w-1/2">
+                      <div className="xl:w-1/2">
                         <Image
                           src={img3}
                           alt="We Automate"
-                          className="hidden h-[60dvh] w-full rounded-lg object-cover md:block"
+                          className="hidden h-[60dvh] w-full rounded-xl object-cover md:block"
                         />
                       </div>
                     </div>
