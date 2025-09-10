@@ -15,6 +15,7 @@ function ContactBanner() {
                 src={contactImg}
                 alt="Contact Us"
                 className="h-full w-full rounded-2xl object-cover"
+                unoptimized
               />
             </div>
 
@@ -33,17 +34,16 @@ function ContactBanner() {
       </div>
 
       {/* Right background image */}
-      <div
-        className="hidden md:block absolute top-0 right-0 h-full w-[50%] lg:w-[45%] xl:w-[40%]"
-        style={{
-          backgroundImage: `url(${bannerBg.src})`,
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "right center",
-          backgroundSize: "cover",
-          transform: "scaleX(-1)",
-          zIndex: 0,
-        }}
-      ></div>
+      <div className="hidden md:block absolute top-0 right-0 h-full w-[50%] lg:w-[45%] xl:w-[40%] overflow-hidden">
+        <Image
+          src={bannerBg}
+          alt="Banner Background"
+          className="object-cover"
+          fill
+          style={{ transform: "scaleX(-1)" }}
+          unoptimized
+        />
+      </div>
 
       {/* Floating Social Icons */}
       <div className="hidden md:flex flex-col items-center justify-center absolute right-4 top-1/2 transform -translate-y-1/2 z-20 space-y-4 rounded-full bg-gray-100 p-2 shadow-lg">
