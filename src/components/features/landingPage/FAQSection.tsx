@@ -60,7 +60,7 @@ const FaqSection = () => {
               {faqData.map((item, index) => (
                 <Disclosure key={index}>
                   {({ open }) => (
-                    <>
+                    <div key={index}>
                       <DisclosureButton className="flex w-full cursor-pointer justify-between border-b border-[#7C7C7C] px-6 py-4 text-left transition-colors duration-300 focus:outline-none">
                         <p className="text-xl">{item.question}</p>
                         <ChevronDownIcon
@@ -70,7 +70,7 @@ const FaqSection = () => {
                       <DisclosurePanel className="rounded-lg px-6 py-4">
                         <p className="text-left">{item.answer}</p>
                       </DisclosurePanel>
-                    </>
+                    </div>
                   )}
                 </Disclosure>
               ))}
