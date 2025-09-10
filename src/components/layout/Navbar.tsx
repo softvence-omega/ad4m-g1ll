@@ -3,7 +3,6 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import logo from "../../../public/assets/Frame 2121457658.png";
 import Wrapper from "../resuable/Wrapper";
 import HomeButton from "../reusable/HomeButton";
 
@@ -40,7 +39,13 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between px-6 relative">
           {/* Logo (left) */}
           <Link href="/" className="flex items-center space-x-2">
-            <Image src={logo} alt="NXDI Logo" width={120} height={40} />
+            {/* Updated to use public path */}
+            <Image
+              src="/assets/Frame 2121457658.png"
+              alt="NXDI Logo"
+              width={120}
+              height={40}
+            />
           </Link>
 
           {/* Nav Links (center - lg only) */}
