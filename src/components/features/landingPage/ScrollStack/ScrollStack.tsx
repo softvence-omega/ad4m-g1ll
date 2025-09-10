@@ -1,671 +1,264 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// "use client";
-// import Lenis from "lenis";
-// import React, { ReactNode, useCallback, useLayoutEffect, useRef } from "react";
+"use client";
+import Wrapper from "@/components/resuable/Wrapper";
+import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import img1 from "../../../../../public/landingPage/img1.png";
+import img2 from "../../../../../public/landingPage/img2.png";
+import img3 from "../../../../../public/landingPage/img3.png";
 
-// export interface ScrollStackItemProps {
-//   itemClassName?: string;
-//   children: ReactNode;
-// }
+const ScrollStack: React.FC = () => {
+  const scrollableSectionRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const ticking = useRef(false);
+  const cardCount = 3;
 
-// export const ScrollStackItem: React.FC<ScrollStackItemProps> = ({
-//   children,
-//   itemClassName = "",
-// }) => (
-//   <div
-//     className={`scroll-stack-card relative my-8 box-border h-80 w-full origin-top rounded-[40px] p-12 shadow-[0_0_30px_rgba(0,0,0,0.1)] will-change-transform ${itemClassName}`.trim()}
-//     style={{
-//       backfaceVisibility: "hidden",
-//       transformStyle: "preserve-3d",
-//     }}
-//   >
-//     {children}
-//   </div>
-// );
+  const getCardTransform = (index: number) => {
+    const isVisible = isIntersecting && activeCardIndex >= index;
+    const scale = 1;
+    let translateY = "100px";
 
-// interface ScrollStackProps {
-//   className?: string;
-//   children: ReactNode;
-//   itemDistance?: number;
-//   itemScale?: number;
-//   itemStackDistance?: number;
-//   stackPosition?: string;
-//   scaleEndPosition?: string;
-//   baseScale?: number;
-//   scaleDuration?: number;
-//   blurAmount?: number;
-//   useWindowScroll?: boolean;
-//   onStackComplete?: () => void;
-// }
-
-// const ScrollStack: React.FC<ScrollStackProps> = ({
-//   children,
-//   className = "",
-//   itemDistance = 100,
-//   itemScale = 0.03,
-//   itemStackDistance = 50,
-//   stackPosition = "20%",
-//   scaleEndPosition = "10%",
-//   baseScale = 0.85,
-//   scaleDuration = 0,
-//   blurAmount = 0,
-//   useWindowScroll = true,
-//   onStackComplete,
-// }) => {
-//   const scrollerRef = useRef<HTMLDivElement>(null);
-//   const stackCompletedRef = useRef(false);
-//   const animationFrameRef = useRef<number | null>(null);
-//   const lenisRef = useRef<Lenis | null>(null);
-//   const cardsRef = useRef<HTMLElement[]>([]);
-//   const lastTransformsRef = useRef(new Map<number, any>());
-//   const isUpdatingRef = useRef(false);
-
-//   // Function to handle scroll position and calculate progress
-//   const calculateProgress = useCallback((scrollTop: number, start: number, end: number) => {
-//     if (scrollTop < start) return 0;
-//     if (scrollTop > end) return 1;
-//     return (scrollTop - start) / (end - start);
-//   }, []);
-
-//   const parsePercentage = useCallback((value: string | number, containerHeight: number) => {
-//     if (typeof value === "string" && value.includes("%")) {
-//       return (parseFloat(value) / 100) * containerHeight;
-//     }
-//     return parseFloat(value as string);
-//   }, []);
-
-//   const getScrollData = useCallback(() => {
-//     if (useWindowScroll) {
-//       return {
-//         scrollTop: window.scrollY,
-//         containerHeight: window.innerHeight,
-//         scrollContainer: document.documentElement,
-//       };
-//     } else {
-//       const scroller = scrollerRef.current;
-//       return {
-//         scrollTop: scroller ? scroller.scrollTop : 0,
-//         containerHeight: scroller ? scroller.clientHeight : 0,
-//         scrollContainer: scroller,
-//       };
-//     }
-//   }, [useWindowScroll]);
-
-//   const getElementOffset = useCallback(
-//     (element: HTMLElement) => {
-//       if (useWindowScroll) {
-//         const rect = element.getBoundingClientRect();
-//         return rect.top + window.scrollY;
-//       } else {
-//         return element.offsetTop;
-//       }
-//     },
-//     [useWindowScroll],
-//   );
-
-//   // Function to update the transforms and handle the scroll effects
-//   const updateCardTransforms = useCallback(() => {
-//     if (!cardsRef.current.length || isUpdatingRef.current) return;
-
-//     isUpdatingRef.current = true;
-
-//     const { scrollTop, containerHeight } = getScrollData();
-//     const stackPositionPx = parsePercentage(stackPosition, containerHeight);
-//     const scaleEndPositionPx = parsePercentage(scaleEndPosition, containerHeight);
-
-//     const endElement = useWindowScroll
-//       ? (document.querySelector(".scroll-stack-end") as HTMLElement | null)
-//       : (scrollerRef.current?.querySelector(".scroll-stack-end") as HTMLElement | null);
-
-//     const endElementTop = endElement ? getElementOffset(endElement) : 0;
-
-//     cardsRef.current.forEach((card, i) => {
-//       if (!card) return;
-
-//       const cardTop = getElementOffset(card);
-//       const triggerStart = cardTop - stackPositionPx - itemStackDistance * i;
-//       const triggerEnd = cardTop - scaleEndPositionPx;
-//       const pinStart = cardTop - stackPositionPx - itemStackDistance * i;
-//       const pinEnd = endElementTop - containerHeight / 2;
-
-//       const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
-//       const targetScale = baseScale + i * itemScale;
-//       const scale = 1 - scaleProgress * (1 - targetScale);
-
-//       let translateY = 0;
-//       const isPinned = scrollTop >= pinStart && scrollTop <= pinEnd;
-
-//       if (isPinned) {
-//         translateY = scrollTop - cardTop + stackPositionPx + itemStackDistance * i;
-//       } else if (scrollTop > pinEnd) {
-//         translateY = pinEnd - cardTop + stackPositionPx + itemStackDistance * i;
-//       }
-
-//       const newTransform = {
-//         translateY: Math.round(translateY * 100) / 100,
-//         scale: Math.round(scale * 1000) / 1000,
-//       };
-
-//       const lastTransform = lastTransformsRef.current.get(i);
-//       const hasChanged =
-//         !lastTransform ||
-//         Math.abs(lastTransform.translateY - newTransform.translateY) > 0.1 ||
-//         Math.abs(lastTransform.scale - newTransform.scale) > 0.001;
-
-//       if (hasChanged) {
-//         const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale})`;
-//         card.style.transform = transform;
-
-//         lastTransformsRef.current.set(i, newTransform);
-//       }
-
-//       if (i === cardsRef.current.length - 1) {
-//         const isInView = scrollTop >= pinStart && scrollTop <= pinEnd;
-//         if (isInView && !stackCompletedRef.current) {
-//           stackCompletedRef.current = true;
-//           onStackComplete?.();
-//         } else if (!isInView && stackCompletedRef.current) {
-//           stackCompletedRef.current = false;
-//         }
-//       }
-//     });
-
-//     isUpdatingRef.current = false;
-//   }, [
-//     itemScale,
-//     itemStackDistance,
-//     stackPosition,
-//     scaleEndPosition,
-//     baseScale,
-//     useWindowScroll,
-//     onStackComplete,
-//     calculateProgress,
-//     parsePercentage,
-//     getScrollData,
-//     getElementOffset,
-//   ]);
-
-//   // Handle scroll event
-//   const handleScroll = useCallback(() => {
-//     updateCardTransforms();
-//   }, [updateCardTransforms]);
-
-//   const setupLenis = useCallback(() => {
-//     if (useWindowScroll) {
-//       const lenis = new Lenis({
-//         duration: 1.2,
-//         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-//         smoothWheel: true,
-//         touchMultiplier: 2,
-//         infinite: false,
-//         wheelMultiplier: 1,
-//         lerp: 0.1,
-//         syncTouch: true,
-//         syncTouchLerp: 0.075,
-//       });
-
-//       lenis.on("scroll", handleScroll);
-
-//       const raf = (time: number) => {
-//         lenis.raf(time);
-//         animationFrameRef.current = requestAnimationFrame(raf);
-//       };
-//       animationFrameRef.current = requestAnimationFrame(raf);
-
-//       lenisRef.current = lenis;
-//       return lenis;
-//     } else {
-//       const scroller = scrollerRef.current;
-//       if (!scroller) return;
-
-//       const lenis = new Lenis({
-//         wrapper: scroller,
-//         content: scroller.querySelector(".scroll-stack-inner") as HTMLElement,
-//         duration: 1.2,
-//         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-//         smoothWheel: true,
-//         touchMultiplier: 2,
-//         infinite: false,
-//         gestureOrientation: "vertical",
-//         wheelMultiplier: 1,
-//         lerp: 0.1,
-//         syncTouch: true,
-//         syncTouchLerp: 0.075,
-//       });
-
-//       lenis.on("scroll", handleScroll);
-
-//       const raf = (time: number) => {
-//         lenis.raf(time);
-//         animationFrameRef.current = requestAnimationFrame(raf);
-//       };
-//       animationFrameRef.current = requestAnimationFrame(raf);
-
-//       lenisRef.current = lenis;
-//       return lenis;
-//     }
-//   }, [handleScroll, useWindowScroll]);
-
-//   // Effect for setting up Lenis and updating transforms
-//   useLayoutEffect(() => {
-//     if (!useWindowScroll && !scrollerRef.current) return;
-
-//     const cards = Array.from(
-//       useWindowScroll
-//         ? document.querySelectorAll(".scroll-stack-card")
-//         : (scrollerRef.current?.querySelectorAll(".scroll-stack-card") ?? []),
-//     ) as HTMLElement[];
-//     cardsRef.current = cards;
-
-//     cards.forEach((card, i) => {
-//       card.style.willChange = "transform";
-//       card.style.transformOrigin = "top center";
-//       card.style.backfaceVisibility = "hidden";
-//       card.style.transform = "translateZ(0)";
-//       card.style.webkitTransform = "translateZ(0)";
-//       card.style.perspective = "1000px";
-//       card.style.webkitPerspective = "1000px";
-//     });
-
-//     setupLenis();
-
-//     updateCardTransforms();
-
-//     return () => {
-//       if (animationFrameRef.current) {
-//         cancelAnimationFrame(animationFrameRef.current);
-//       }
-//       if (lenisRef.current) {
-//         lenisRef.current.destroy();
-//       }
-//       stackCompletedRef.current = false;
-//       cardsRef.current = [];
-//       isUpdatingRef.current = false;
-//     };
-//   }, [
-//     itemDistance,
-//     itemScale,
-//     itemStackDistance,
-//     stackPosition,
-//     scaleEndPosition,
-//     baseScale,
-//     scaleDuration,
-//     blurAmount,
-//     useWindowScroll,
-//     onStackComplete,
-//     setupLenis,
-//     updateCardTransforms,
-//   ]);
-
-//   return (
-//     <div
-//       className={`relative h-full w-full overflow-x-visible overflow-y-auto ${className}`.trim()}
-//       ref={scrollerRef}
-//       style={{
-//         overscrollBehavior: "contain",
-//         WebkitOverflowScrolling: "touch",
-//         scrollBehavior: "smooth",
-//         WebkitTransform: "translateZ(0)",
-//         transform: "translateZ(0)",
-//         willChange: "scroll-position",
-//       }}
-//     >
-//       <div className="scroll-stack-inner h-auto overflow-auto">
-//         {children}
-//         <div className="scroll-stack-end mb-20 w-full" />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ScrollStack;
-import Lenis from "lenis";
-import React, { ReactNode, useCallback, useLayoutEffect, useRef } from "react";
-
-export interface ScrollStackItemProps {
-  itemClassName?: string;
-  children: ReactNode;
-}
-
-export const ScrollStackItem: React.FC<ScrollStackItemProps> = ({
-  children,
-  itemClassName = "",
-}) => (
-  <div
-    className={`scroll-stack-card relative my-8 box-border h-80 w-full origin-top rounded-[40px] p-12 shadow-[0_0_30px_rgba(0,0,0,0.1)] will-change-transform ${itemClassName}`.trim()}
-    style={{
-      backfaceVisibility: "hidden",
-      transformStyle: "preserve-3d",
-    }}
-  >
-    {children}
-  </div>
-);
-
-interface ScrollStackProps {
-  className?: string;
-  children: ReactNode;
-  itemDistance?: number;
-  itemScale?: number;
-  itemStackDistance?: number;
-  stackPosition?: string;
-  scaleEndPosition?: string;
-  baseScale?: number;
-  scaleDuration?: number;
-  rotationAmount?: number;
-  blurAmount?: number;
-  useWindowScroll?: boolean;
-  onStackComplete?: () => void;
-}
-
-const ScrollStack: React.FC<ScrollStackProps> = ({
-  children,
-  className = "",
-  itemDistance = 100,
-  itemScale = 0.03,
-  itemStackDistance = 30,
-  stackPosition = "20%",
-  scaleEndPosition = "10%",
-  baseScale = 0.85,
-  scaleDuration = 0.5,
-  rotationAmount = 0,
-  blurAmount = 0,
-  useWindowScroll = false,
-  onStackComplete,
-}) => {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const stackCompletedRef = useRef(false);
-  const animationFrameRef = useRef<number | null>(null);
-  const lenisRef = useRef<Lenis | null>(null);
-  const cardsRef = useRef<HTMLElement[]>([]);
-  const lastTransformsRef = useRef(new Map<number, any>());
-  const isUpdatingRef = useRef(false);
-
-  const calculateProgress = useCallback((scrollTop: number, start: number, end: number) => {
-    if (scrollTop < start) return 0;
-    if (scrollTop > end) return 1;
-    return (scrollTop - start) / (end - start);
-  }, []);
-
-  const parsePercentage = useCallback((value: string | number, containerHeight: number) => {
-    if (typeof value === "string" && value.includes("%")) {
-      return (parseFloat(value) / 100) * containerHeight;
+    if (isVisible) {
+      translateY = `${90 - index * 30}px`;
     }
-    return parseFloat(value as string);
-  }, []);
 
-  const getScrollData = useCallback(() => {
-    if (useWindowScroll) {
-      return {
-        scrollTop: window.scrollY,
-        containerHeight: window.innerHeight,
-        scrollContainer: document.documentElement,
-      };
-    } else {
-      const scroller = scrollerRef.current;
-      return {
-        scrollTop: scroller ? scroller.scrollTop : 0,
-        containerHeight: scroller ? scroller.clientHeight : 0,
-        scrollContainer: scroller,
-      };
+    return {
+      transform: `translateY(${translateY}) scale(${scale})`,
+      opacity: isVisible ? (index === 0 ? 0.9 : 1) : 0,
+      zIndex: 10 + index * 10,
+      pointerEvents: isVisible ? "auto" : ("none" as "auto" | "none"),
+    };
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsIntersecting(entry.isIntersecting);
+      },
+      { threshold: 0.1 },
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
-  }, [useWindowScroll]);
 
-  const getElementOffset = useCallback(
-    (element: HTMLElement) => {
-      if (useWindowScroll) {
-        const rect = element.getBoundingClientRect();
-        return rect.top + window.scrollY;
-      } else {
-        return element.offsetTop;
-      }
-    },
-    [useWindowScroll],
-  );
+    const handleScroll = () => {
+      if (!ticking.current) {
+        requestAnimationFrame(() => {
+          if (!sectionRef.current || !scrollableSectionRef.current) return;
 
-  const updateCardTransforms = useCallback(() => {
-    if (!cardsRef.current.length || isUpdatingRef.current) return;
+          const sectionRect = sectionRef.current.getBoundingClientRect();
+          const parentRect = scrollableSectionRef.current.getBoundingClientRect();
+          const viewportHeight = parentRect?.height ?? window.innerHeight;
 
-    isUpdatingRef.current = true;
+          const sectionTop = sectionRect.top - parentRect.top;
+          const sectionHeight = sectionRef.current.offsetHeight;
+          const scrollableDistance = sectionHeight - viewportHeight;
 
-    const { scrollTop, containerHeight, scrollContainer } = getScrollData();
-    const stackPositionPx = parsePercentage(stackPosition, containerHeight);
-    const scaleEndPositionPx = parsePercentage(scaleEndPosition, containerHeight);
-
-    const endElement = useWindowScroll
-      ? (document.querySelector(".scroll-stack-end") as HTMLElement | null)
-      : (scrollerRef.current?.querySelector(".scroll-stack-end") as HTMLElement | null);
-
-    const endElementTop = endElement ? getElementOffset(endElement) : 0;
-
-    cardsRef.current.forEach((card, i) => {
-      if (!card) return;
-
-      const cardTop = getElementOffset(card);
-      const triggerStart = cardTop - stackPositionPx - itemStackDistance * i;
-      const triggerEnd = cardTop - scaleEndPositionPx;
-      const pinStart = cardTop - stackPositionPx - itemStackDistance * i;
-      const pinEnd = endElementTop - containerHeight / 2;
-
-      const scaleProgress = calculateProgress(scrollTop, triggerStart, triggerEnd);
-      const targetScale = baseScale + i * itemScale;
-      const scale = 1 - scaleProgress * (1 - targetScale);
-      const rotation = rotationAmount ? i * rotationAmount * scaleProgress : 0;
-
-      let blur = 0;
-      if (blurAmount) {
-        let topCardIndex = 0;
-        for (let j = 0; j < cardsRef.current.length; j++) {
-          const jCardTop = getElementOffset(cardsRef.current[j]);
-          const jTriggerStart = jCardTop - stackPositionPx - itemStackDistance * j;
-          if (scrollTop >= jTriggerStart) {
-            topCardIndex = j;
+          let progress = 0;
+          if (sectionTop <= 0 && Math.abs(sectionTop) <= scrollableDistance) {
+            progress = Math.abs(sectionTop) / scrollableDistance;
+          } else if (sectionTop <= 0) {
+            progress = 1;
           }
-        }
 
-        if (i < topCardIndex) {
-          const depthInStack = topCardIndex - i;
-          blur = Math.max(0, depthInStack * blurAmount);
-        }
+          let newActiveIndex = 0;
+          const progressPerCard = 1 / cardCount;
+          for (let i = 0; i < cardCount; i++) {
+            if (progress >= progressPerCard * (i + 1)) {
+              newActiveIndex = i + 1;
+            }
+          }
+
+          setActiveCardIndex(Math.min(newActiveIndex, cardCount - 1));
+          ticking.current = false;
+        });
+        ticking.current = true;
       }
+    };
 
-      let translateY = 0;
-      const isPinned = scrollTop >= pinStart && scrollTop <= pinEnd;
-
-      if (isPinned) {
-        translateY = scrollTop - cardTop + stackPositionPx + itemStackDistance * i;
-      } else if (scrollTop > pinEnd) {
-        translateY = pinEnd - cardTop + stackPositionPx + itemStackDistance * i;
-      }
-
-      const newTransform = {
-        translateY: Math.round(translateY * 100) / 100,
-        scale: Math.round(scale * 1000) / 1000,
-        rotation: Math.round(rotation * 100) / 100,
-        blur: Math.round(blur * 100) / 100,
-      };
-
-      const lastTransform = lastTransformsRef.current.get(i);
-      const hasChanged =
-        !lastTransform ||
-        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.1 ||
-        Math.abs(lastTransform.scale - newTransform.scale) > 0.001 ||
-        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.1 ||
-        Math.abs(lastTransform.blur - newTransform.blur) > 0.1;
-
-      if (hasChanged) {
-        const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
-        const filter = newTransform.blur > 0 ? `blur(${newTransform.blur}px)` : "";
-
-        card.style.transform = transform;
-        card.style.filter = filter;
-
-        lastTransformsRef.current.set(i, newTransform);
-      }
-
-      if (i === cardsRef.current.length - 1) {
-        const isInView = scrollTop >= pinStart && scrollTop <= pinEnd;
-        if (isInView && !stackCompletedRef.current) {
-          stackCompletedRef.current = true;
-          onStackComplete?.();
-        } else if (!isInView && stackCompletedRef.current) {
-          stackCompletedRef.current = false;
-        }
-      }
-    });
-
-    isUpdatingRef.current = false;
-  }, [
-    itemScale,
-    itemStackDistance,
-    stackPosition,
-    scaleEndPosition,
-    baseScale,
-    rotationAmount,
-    blurAmount,
-    useWindowScroll,
-    onStackComplete,
-    calculateProgress,
-    parsePercentage,
-    getScrollData,
-    getElementOffset,
-  ]);
-
-  const handleScroll = useCallback(() => {
-    updateCardTransforms();
-  }, [updateCardTransforms]);
-
-  const setupLenis = useCallback(() => {
-    if (useWindowScroll) {
-      const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2,
-        infinite: false,
-        wheelMultiplier: 1,
-        lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075,
-      });
-
-      lenis.on("scroll", handleScroll);
-
-      const raf = (time: number) => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
-      };
-      animationFrameRef.current = requestAnimationFrame(raf);
-
-      lenisRef.current = lenis;
-      return lenis;
-    } else {
-      const scroller = scrollerRef.current;
-      if (!scroller) return;
-
-      const lenis = new Lenis({
-        wrapper: scroller,
-        content: scroller.querySelector(".scroll-stack-inner") as HTMLElement,
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-        touchMultiplier: 2,
-        infinite: false,
-        gestureOrientation: "vertical",
-        wheelMultiplier: 1,
-        lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075,
-      });
-
-      lenis.on("scroll", handleScroll);
-
-      const raf = (time: number) => {
-        lenis.raf(time);
-        animationFrameRef.current = requestAnimationFrame(raf);
-      };
-      animationFrameRef.current = requestAnimationFrame(raf);
-
-      lenisRef.current = lenis;
-      return lenis;
-    }
-  }, [handleScroll, useWindowScroll]);
-
-  useLayoutEffect(() => {
-    if (!useWindowScroll && !scrollerRef.current) return;
-
-    const cards = Array.from(
-      useWindowScroll
-        ? document.querySelectorAll(".scroll-stack-card")
-        : (scrollerRef.current?.querySelectorAll(".scroll-stack-card") ?? []),
-    ) as HTMLElement[];
-    cardsRef.current = cards;
-    const transformsCache = lastTransformsRef.current;
-
-    cards.forEach((card, i) => {
-      if (i < cards.length - 1) {
-        card.style.marginBottom = `${itemDistance}px`;
-      }
-      card.style.willChange = "transform, filter";
-      card.style.transformOrigin = "top center";
-      card.style.backfaceVisibility = "hidden";
-      card.style.transform = "translateZ(0)";
-      card.style.webkitTransform = "translateZ(0)";
-      card.style.perspective = "1000px";
-      card.style.webkitPerspective = "1000px";
-    });
-
-    setupLenis();
-
-    updateCardTransforms();
+    const scrollElement = scrollableSectionRef.current;
+    scrollElement?.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
 
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (lenisRef.current) {
-        lenisRef.current.destroy();
-      }
-      stackCompletedRef.current = false;
-      cardsRef.current = [];
-      transformsCache.clear();
-      isUpdatingRef.current = false;
+      scrollElement?.removeEventListener("scroll", handleScroll);
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
     };
-  }, [
-    itemDistance,
-    itemScale,
-    itemStackDistance,
-    stackPosition,
-    scaleEndPosition,
-    baseScale,
-    scaleDuration,
-    rotationAmount,
-    blurAmount,
-    useWindowScroll,
-    onStackComplete,
-    setupLenis,
-    updateCardTransforms,
-  ]);
+  }, [cardCount]);
 
   return (
-    <div
-      className={`relative h-full w-full overflow-x-visible overflow-y-auto ${className}`.trim()}
-      ref={scrollerRef}
-      style={{
-        overscrollBehavior: "contain",
-        WebkitOverflowScrolling: "touch",
-        scrollBehavior: "smooth",
-        WebkitTransform: "translateZ(0)",
-        transform: "translateZ(0)",
-        willChange: "scroll-position",
-      }}
+    <section
+      ref={scrollableSectionRef}
+      className="scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300 scrollbar-hidden relative max-h-[140dvh] w-full lg:max-h-[100dvh]"
     >
-      <div className="scroll-stack-inner px-20 pt-[20vh] pb-[50rem]">
-        {children}
-        {/* Spacer so the last pin can release cleanly */}
-        <div className="scroll-stack-end h-px w-full" />
+      <div ref={sectionRef} className="relative h-[155dvh] lg:h-[205dvh]">
+        <div className="sticky top-0 flex w-full items-center justify-center overflow-hidden">
+          <div className="mx-auto flex h-full w-full flex-col justify-center">
+            <div className="relative mx-auto h-[150dvh] w-full lg:h-[100dvh]">
+              {/* Static ScrollStackItem for "We Mine" */}
+              <div
+                className={`absolute z-50 overflow-hidden shadow-xl transition-all duration-300`}
+                style={{
+                  top: 0,
+                  left: "50%",
+                  transform: `translateX(-50%) ${getCardTransform(0).transform}`,
+                  width: "100%",
+                  opacity: getCardTransform(0).opacity,
+                  zIndex: getCardTransform(0).zIndex,
+                  pointerEvents: getCardTransform(0)?.pointerEvents,
+                }}
+              >
+                <div className="bg-text-tertiary w-full rounded-t-lg">
+                  <Wrapper>
+                    <div className="flex w-full flex-col justify-between gap-20 py-20 lg:flex-row lg:items-center">
+                      <div className="text-white lg:w-1/2">
+                        <h2 className="mb-6 text-2xl font-bold lg:text-[32px]">We Mine</h2>
+                        <p className="mb-8 lg:text-lg">
+                          Process mining provides organisations with deep, data-driven insights into
+                          their operational workflows by systematically analysing system data.
+                          Through a structured and meticulous evaluation of system events, NXDI
+                          enables businesses to identify inefficiencies, address compliance risks,
+                          and uncover opportunities for optimisation. We leverage advanced analytics
+                          and industry-leading methodologies to map and assess processes within
+                          real-world conditions, delivering a transparent, evidence-based view of
+                          operational performance. This comprehensive approach empowers
+                          organisations to streamline workflows, enhance efficiency, and establish a
+                          strong foundation for seamless process automation. By proactively
+                          identifying inefficiencies, businesses can make informed, strategic
+                          decisions that drive operational excellence and foster a culture of
+                          continuous improvement. Furthermore, our detailed, insight-rich reporting
+                          provides organisations with clear, actionable recommendations, ensuring
+                          sustainable growth, enhanced performance, and long-term business
+                          resilience.
+                        </p>
+                        <a href="#" className="font-semibold underline">
+                          Read More
+                        </a>
+                      </div>
+                      <div className="lg:w-1/2">
+                        <Image
+                          src={img1}
+                          alt="We Mine"
+                          className="hidden h-[60dvh] w-full rounded-lg object-cover md:block"
+                        />
+                      </div>
+                    </div>
+                  </Wrapper>
+                </div>
+              </div>
+
+              {/* Static ScrollStackItem for "We Improve" */}
+              <div
+                className={`absolute z-50 overflow-hidden shadow-xl transition-all duration-300`}
+                style={{
+                  top: 0,
+                  left: "50%",
+                  transform: `translateX(-50%) ${getCardTransform(1).transform}`,
+                  width: "100%",
+                  opacity: getCardTransform(1).opacity,
+                  zIndex: getCardTransform(1).zIndex,
+                  pointerEvents: getCardTransform(1).pointerEvents,
+                }}
+              >
+                <div className="bg-text-primary w-full rounded-t-lg">
+                  <Wrapper>
+                    <div className="flex w-full flex-col justify-between gap-20 py-20 lg:flex-row lg:items-center">
+                      <div className="text-white lg:w-1/2">
+                        <h2 className="mb-6 text-2xl font-bold lg:text-[32px]">We Improve</h2>
+                        <p className="mb-8 lg:text-lg">
+                          Enhancing operational efficiency requires a structured and strategic
+                          approach to process improvement. At NXDI, we work in close partnership
+                          with your organisation to identify inefficiencies, address operational
+                          challenges, and optimise workflows to drive productivity and service
+                          excellence. We undertake comprehensive end-to-end process evaluations,
+                          engaging key stakeholders and applying data-driven insights to develop
+                          tailored, high-impact solutions. By ensuring that processes are fully
+                          aligned with business objectives, we support organisations in implementing
+                          targeted improvements and automation strategies that streamline
+                          operations, reduce complexity, and enhance overall performance. Our
+                          consultative approach fosters collaboration across all levels of the
+                          organisation, ensuring stakeholder engagement and cultivating a culture of
+                          continuous improvement. This holistic methodology not only delivers
+                          immediate operational benefits but also establishes a resilient framework
+                          for sustained efficiency, adaptability, and long-term business success in
+                          an evolving marketplace.
+                        </p>
+                        <a href="#" className="font-semibold underline">
+                          Read More
+                        </a>
+                      </div>
+                      <div className="lg:w-1/2">
+                        <Image
+                          src={img2}
+                          alt="We Improve"
+                          className="hidden h-[60dvh] w-full rounded-lg object-cover md:block"
+                        />
+                      </div>
+                    </div>
+                  </Wrapper>
+                </div>
+              </div>
+
+              {/* Static ScrollStackItem for "We Automate" */}
+              <div
+                className={`absolute z-50 overflow-hidden shadow-xl transition-all duration-300`}
+                style={{
+                  top: 0,
+                  left: "50%",
+                  transform: `translateX(-50%) ${getCardTransform(2).transform}`,
+                  width: "100%",
+                  opacity: getCardTransform(2).opacity,
+                  zIndex: getCardTransform(2).zIndex,
+                  pointerEvents: getCardTransform(2).pointerEvents,
+                }}
+              >
+                <div className="bg-text-secondary w-full rounded-t-lg">
+                  <Wrapper>
+                    <div className="flex w-full flex-col justify-between gap-20 py-20 lg:flex-row lg:items-center">
+                      <div className="text-white lg:w-1/2">
+                        <h2 className="mb-6 text-2xl font-bold lg:text-[32px]">We Automate</h2>
+                        <p className="mb-8 lg:text-lg">
+                          Strategic automation is essential for organisations seeking to enhance
+                          operational efficiency, optimise resources, and scale effectively. At
+                          NXDI, we focus on assessing automation readiness, identifying high-impact
+                          opportunities, and developing tailored solutions that deliver measurable
+                          business value. A key area of our expertise is Software Robotics (SR),
+                          which enables organisations to automate repetitive tasks, enhance
+                          accuracy, and improve workforce productivity. By implementing intelligent
+                          automation strategies, we empower businesses to reallocate valuable
+                          resources towards innovation, customer experience, and long-term strategic
+                          growth.Beyond implementation, we provide ongoing support and performance
+                          monitoring to ensure the sustainability and continuous optimisation of
+                          automation initiatives. We prioritise seamless integration with existing
+                          workflows, minimising disruption while maximising efficiency gains. With
+                          our expertise, organisations can enhance agility, reduce operational
+                          costs, and maintain a competitive advantage in an increasingly dynamic
+                          business environment.
+                        </p>
+                        <a href="#" className="font-semibold underline">
+                          Read More
+                        </a>
+                      </div>
+
+                      <div className="lg:w-1/2">
+                        <Image
+                          src={img3}
+                          alt="We Automate"
+                          className="hidden h-[60dvh] w-full rounded-lg object-cover md:block"
+                        />
+                      </div>
+                    </div>
+                  </Wrapper>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
