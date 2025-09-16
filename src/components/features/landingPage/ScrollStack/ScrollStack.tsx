@@ -94,7 +94,7 @@ const ScrollStack: React.FC = () => {
       style={{
         height:
           uniformHeight && typeof window !== "undefined"
-            ? `${uniformHeight * sections.length - window.innerHeight}px`
+            ? `${uniformHeight * sections.length - window.innerHeight + 80}px`
             : "0px", // fallback for SSR
       }}
     >
@@ -106,8 +106,9 @@ const ScrollStack: React.FC = () => {
             className="absolute inset-0 w-full"
             style={{
               transform: `translateY(${(1 - scrollProgress[section.key]) * 100 * i}%)`,
+              transition: "transform .5s ease-out",
               zIndex: i + 1,
-              height: `${uniformHeight - 150}px`,
+              height: `${uniformHeight}px`,
             }}
           >
             {section.component}
@@ -119,7 +120,3 @@ const ScrollStack: React.FC = () => {
 };
 
 export default ScrollStack;
-
-// transform: `translateY(${
-//   (1 - scrollProgress[section.key]) * 100 * i
-// }%)`,

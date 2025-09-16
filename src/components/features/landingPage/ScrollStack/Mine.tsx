@@ -1,5 +1,6 @@
 "use client";
 import image1 from "@/../public/landingPage/img1.png";
+import HomeButton from "@/components/reusable/HomeButton";
 import ScrollButton from "@/components/reusable/ScrollButton";
 import Wrapper from "@/components/reusable/Wrapper";
 import Image from "next/image";
@@ -10,8 +11,8 @@ const Mine: React.FC = () => {
     <div className="h-full w-full shadow-xl">
       <div className="bg-text-tertiary h-full w-full rounded-t-4xl">
         <Wrapper>
-          <div className="flex w-full flex-col justify-between gap-20 py-20 xl:flex-row xl:items-center">
-            <div className="relative hidden h-[60dvh] w-full md:block xl:w-1/2">
+          <div className="flex w-full flex-col justify-between gap-20 py-20 xl:flex-row">
+            <div className="relative hidden h-[65dvh] w-full md:block xl:w-1/2">
               <Image src={image1} alt="We Mine" fill className="rounded-xl object-cover" />
             </div>
             <div className="text-white xl:w-1/2">
@@ -33,7 +34,7 @@ const Mine: React.FC = () => {
                 business resilience.
               </p>
 
-              <ScrollButton title="Read More" />
+              <HomeButton title="Read More" />
             </div>
           </div>
         </Wrapper>
