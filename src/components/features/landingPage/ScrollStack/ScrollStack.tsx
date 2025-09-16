@@ -1,197 +1,121 @@
 "use client";
-import Wrapper from "@/components/resuable/Wrapper";
-import Image from "next/image";
+
 import React, { useEffect, useRef, useState } from "react";
+import Automate from "./Automate";
+import Improve from "./Improve";
+import Mine from "./Mine";
+
+interface ScrollProgress {
+  [key: string]: number;
+  overall: number;
+}
+
+// best for animation
 
 const ScrollStack: React.FC = () => {
-  const scrollableSectionRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const ticking = useRef(false);
-  const cardCount = 3;
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const getCardTransform = (index: number) => {
-    const isVisible = isIntersecting && activeCardIndex >= index;
-    const scale = 1;
-    let translateY = "100px";
+  const sectionRefs = [
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+  ];
 
-    if (isVisible) {
-      translateY = `${90 - index * 30}px`;
-    }
+  const sectionKeys = ["mine", "improve", "automate"];
 
-    return {
-      transform: `translateY(${translateY}) scale(${scale})`,
-      opacity: isVisible ? (index === 0 ? 0.9 : 1) : 0,
-      zIndex: 10 + index * 10,
-      pointerEvents: isVisible ? "auto" : ("none" as "auto" | "none"),
-    };
-  };
+  const [scrollProgress, setScrollProgress] = useState<ScrollProgress>({
+    mine: 0,
+    improve: 0,
+    automate: 0,
+    overall: 0,
+  });
 
+  const [uniformHeight, setUniformHeight] = useState(0);
+
+  // Measure tallest section after mount
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        setIsIntersecting(entry.isIntersecting);
-      },
-      { threshold: 0.1 },
-    );
+    const measureHeights = () => {
+      if (typeof window === "undefined") return;
+      const heights = sectionRefs.map((ref) => ref.current?.scrollHeight || 0);
+      const maxHeight = Math.max(...heights, window.innerHeight, 600);
+      setUniformHeight(maxHeight);
+    };
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    measureHeights();
+    window.addEventListener("resize", measureHeights);
+    return () => window.removeEventListener("resize", measureHeights);
+  }, []);
+
+  // Scroll progress
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const stickyOffset = 40; // matches top-40
 
     const handleScroll = () => {
-      if (!ticking.current) {
-        requestAnimationFrame(() => {
-          if (!sectionRef.current || !scrollableSectionRef.current) return;
+      if (!containerRef.current || uniformHeight === 0) return;
 
-          const sectionRect = sectionRef.current.getBoundingClientRect();
-          const parentRect = scrollableSectionRef.current.getBoundingClientRect();
-          const viewportHeight = parentRect?.height ?? window.innerHeight;
+      const rect = containerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
 
-          const sectionTop = sectionRect.top - parentRect.top;
-          const sectionHeight = sectionRef.current.offsetHeight;
-          const scrollableDistance = sectionHeight - viewportHeight;
+      // Adjust for sticky offset
+      const progress = Math.max(
+        0,
+        Math.min(1, (-rect.top + stickyOffset) / (rect.height - windowHeight)),
+      );
 
-          let progress = 0;
-          if (sectionTop <= 0 && Math.abs(sectionTop) <= scrollableDistance) {
-            progress = Math.abs(sectionTop) / scrollableDistance;
-          } else if (sectionTop <= 0) {
-            progress = 1;
-          }
+      const newProgress: ScrollProgress = { overall: progress };
+      const phase = 1 / sectionRefs.length;
 
-          let newActiveIndex = 0;
-          const progressPerCard = 1 / cardCount;
-          for (let i = 0; i < cardCount; i++) {
-            if (progress >= progressPerCard * (i + 1)) {
-              newActiveIndex = i + 1;
-            }
-          }
+      sectionKeys.forEach((key, i) => {
+        if (progress <= phase * i) newProgress[key] = 0;
+        else if (progress >= phase * (i + 1)) newProgress[key] = 1;
+        else newProgress[key] = (progress - phase * i) / phase;
+      });
 
-          setActiveCardIndex(Math.min(newActiveIndex, cardCount - 1));
-          ticking.current = false;
-        });
-        ticking.current = true;
-      }
+      setScrollProgress(newProgress);
     };
 
-    const scrollElement = scrollableSectionRef.current;
-    scrollElement?.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll);
     handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [uniformHeight]);
 
-    return () => {
-      scrollElement?.removeEventListener("scroll", handleScroll);
-      if (sectionRef.current) observer.unobserve(sectionRef.current);
-    };
-  }, [cardCount]);
-
-  const cardImages = ["/landingPage/img1.png", "/landingPage/img2.png", "/landingPage/img3.png"];
-
-  const cardTexts = [
-    `Process mining provides organisations with deep, data-driven insights into
-    their operational workflows by systematically analysing system data.
-    Through a structured and meticulous evaluation of system events, NXDI
-    enables businesses to identify inefficiencies, address compliance risks,
-    and uncover opportunities for optimisation. We leverage advanced analytics
-    and industry-leading methodologies to map and assess processes within
-    real-world conditions, delivering a transparent, evidence-based view of
-    operational performance. This comprehensive approach empowers
-    organisations to streamline workflows, enhance efficiency, and establish a
-    strong foundation for seamless process automation. By proactively
-    identifying inefficiencies, businesses can make informed, strategic
-    decisions that drive operational excellence and foster a culture of
-    continuous improvement. Furthermore, our detailed, insight-rich reporting
-    provides organisations with clear, actionable recommendations, ensuring
-    sustainable growth, enhanced performance, and long-term business
-    resilience.`,
-    `Enhancing operational efficiency requires a structured and strategic
-    approach to process improvement. At NXDI, we work in close partnership
-    with your organisation to identify inefficiencies, address operational
-    challenges, and optimise workflows to drive productivity and service
-    excellence. We undertake comprehensive end-to-end process evaluations,
-    engaging key stakeholders and applying data-driven insights to develop
-    tailored, high-impact solutions. By ensuring that processes are fully
-    aligned with business objectives, we support organisations in implementing
-    targeted improvements and automation strategies that streamline
-    operations, reduce complexity, and enhance overall performance. Our
-    consultative approach fosters collaboration across all levels of the
-    organisation, ensuring stakeholder engagement and cultivating a culture of
-    continuous improvement. This holistic methodology not only delivers
-    immediate operational benefits but also establishes a resilient framework
-    for sustained efficiency, adaptability, and long-term business success in
-    an evolving marketplace.`,
-    `Strategic automation is essential for organisations seeking to enhance
-    operational efficiency, optimise resources, and scale effectively. At
-    NXDI, we focus on assessing automation readiness, identifying high-impact
-    opportunities, and developing tailored solutions that deliver measurable
-    business value. A key area of our expertise is Software Robotics (SR),
-    which enables organisations to automate repetitive tasks, enhance
-    accuracy, and improve workforce productivity. By implementing intelligent
-    automation strategies, we empower businesses to reallocate valuable
-    resources towards innovation, customer experience, and long-term strategic
-    growth. Beyond implementation, we provide ongoing support and performance
-    monitoring to ensure the sustainability and continuous optimisation of
-    automation initiatives. We prioritise seamless integration with existing
-    workflows, minimising disruption while maximising efficiency gains. With
-    our expertise, organisations can enhance agility, reduce operational
-    costs, and maintain a competitive advantage in an increasingly dynamic
-    business environment.`,
+  const sections = [
+    { key: "mine", ref: sectionRefs[0], component: <Mine /> },
+    { key: "improve", ref: sectionRefs[1], component: <Improve /> },
+    { key: "automate", ref: sectionRefs[2], component: <Automate /> },
   ];
 
   return (
-    <section
-      ref={scrollableSectionRef}
-      className="scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300 scrollbar-hidden relative max-h-[140dvh] w-full xl:max-h-[100dvh]"
+    <div
+      ref={containerRef}
+      className="relative w-full bg-[#F6F6F6]"
+      style={{
+        height:
+          uniformHeight && typeof window !== "undefined"
+            ? `${uniformHeight * sections.length - window.innerHeight + 80}px`
+            : "0px", // fallback for SSR
+      }}
     >
-      <div ref={sectionRef} className="relative h-[155dvh] xl:h-[205dvh]">
-        <div className="sticky top-0 flex w-full items-center justify-center overflow-hidden">
-          <div className="mx-auto flex h-full w-full flex-col justify-center">
-            <div className="relative mx-auto h-[150dvh] w-full xl:h-[100dvh]">
-              {["We Mine", "We Improve", "We Automate"].map((title, index) => (
-                <div
-                  key={index}
-                  className={`absolute z-50 overflow-hidden shadow-xl transition-all duration-300`}
-                  style={{
-                    top: 0,
-                    left: "50%",
-                    transform: `translateX(-50%) ${getCardTransform(index).transform}`,
-                    width: "100%",
-                    opacity: getCardTransform(index).opacity,
-                    zIndex: getCardTransform(index).zIndex,
-                    pointerEvents: getCardTransform(index).pointerEvents,
-                  }}
-                >
-                  <div className={`w-full rounded-t-xl ${index === 0 ? "bg-text-tertiary" : index === 1 ? "bg-text-primary" : "bg-text-secondary"}`}>
-                    <Wrapper>
-                      <div className="flex w-full flex-col justify-between gap-20 py-20 xl:flex-row xl:items-center">
-                        <div className="text-white xl:w-1/2">
-                          <h2 className="mb-6 text-2xl font-bold xl:text-[32px]">{title}</h2>
-                          <p className="mb-8 xl:text-xl">
-                            {cardTexts[index]}
-                          </p>
-                          <a href="#" className="font-semibold underline">
-                            Read More
-                          </a>
-                        </div>
-                        <div className="xl:w-1/2 relative h-[60dvh] w-full md:block hidden">
-                          <Image
-                            src={cardImages[index]}
-                            alt={title}
-                            fill
-                            className="rounded-xl object-cover"
-                          />
-                        </div>
-                      </div>
-                    </Wrapper>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className="sticky top-40 h-screen w-full overflow-hidden">
+        {sections.map((section, i) => (
+          <div
+            key={section.key}
+            ref={section.ref}
+            className="absolute inset-0 w-full"
+            style={{
+              transform: `translateY(${(1 - scrollProgress[section.key]) * 100 * i}%)`,
+              transition: "transform .5s ease-out",
+              zIndex: i + 1,
+              height: `${uniformHeight}px`,
+            }}
+          >
+            {section.component}
           </div>
-        </div>
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
 
