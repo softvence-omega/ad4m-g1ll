@@ -1,25 +1,27 @@
 "use client";
 
-import type React from "react";
-
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Automate from "./Automate";
 import Improve from "./Improve";
 import Mine from "./Mine";
 
 interface ScrollProgress {
-  mine: number;
-  improve: number;
-  automate: number;
+  [key: string]: number;
   overall: number;
 }
 
-// best
+// best for animation
+
 const ScrollStack: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mineRef = useRef<HTMLDivElement>(null);
-  const improveRef = useRef<HTMLDivElement>(null);
-  const automateRef = useRef<HTMLDivElement>(null);
+
+  const sectionRefs = [
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+  ];
+
+  const sectionKeys = ["mine", "improve", "automate"];
 
   const [scrollProgress, setScrollProgress] = useState<ScrollProgress>({
     mine: 0,
@@ -30,126 +32,94 @@ const ScrollStack: React.FC = () => {
 
   const [uniformHeight, setUniformHeight] = useState(0);
 
+  // Measure tallest section after mount
   useEffect(() => {
     const measureHeights = () => {
-      if (mineRef.current && improveRef.current && automateRef.current) {
-        const mineHeight = mineRef.current.scrollHeight;
-        const improveHeight = improveRef.current.scrollHeight;
-        const automateHeight = automateRef.current.scrollHeight;
-
-        const maxHeight = Math.max(mineHeight, improveHeight, automateHeight, 600);
-        setUniformHeight(maxHeight);
-      }
+      if (typeof window === "undefined") return;
+      const heights = sectionRefs.map((ref) => ref.current?.scrollHeight || 0);
+      const maxHeight = Math.max(...heights, window.innerHeight, 600);
+      setUniformHeight(maxHeight);
     };
 
-    // Delay measurement to ensure components are rendered
-    const timer = setTimeout(measureHeights, 100);
-
-    const handleResize = () => {
-      measureHeights();
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      clearTimeout(timer);
-    };
+    measureHeights();
+    window.addEventListener("resize", measureHeights);
+    return () => window.removeEventListener("resize", measureHeights);
   }, []);
 
+  // Scroll progress
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const stickyOffset = 40; // matches top-40
+
     const handleScroll = () => {
       if (!containerRef.current || uniformHeight === 0) return;
 
       const rect = containerRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
 
-      // Simple progress calculation: when container top reaches top of viewport
-      const progress = Math.max(0, Math.min(1, -rect.top / (rect.height - windowHeight)));
+      // Adjust for sticky offset
+      const progress = Math.max(
+        0,
+        Math.min(1, (-rect.top + stickyOffset) / (rect.height - windowHeight)),
+      );
 
-      // Sequential phases for stacking effect
-      let mineProgress = 0;
-      let improveProgress = 0;
-      let automateProgress = 0;
+      const newProgress: ScrollProgress = { overall: progress };
+      const phase = 1 / sectionRefs.length;
 
-      if (progress <= 0.33) {
-        // Phase 1: Mine slides up
-        mineProgress = progress / 0.33;
-      } else if (progress <= 0.66) {
-        // Phase 2: Mine is fixed, Improve slides up
-        mineProgress = 1;
-        improveProgress = (progress - 0.33) / 0.33;
-      } else {
-        // Phase 3: Mine and Improve are fixed, Automate slides up
-        mineProgress = 1;
-        improveProgress = 1;
-        automateProgress = (progress - 0.66) / 0.34;
-      }
-
-      setScrollProgress({
-        mine: mineProgress,
-        improve: improveProgress,
-        automate: automateProgress,
-        overall: progress,
+      sectionKeys.forEach((key, i) => {
+        if (progress <= phase * i) newProgress[key] = 0;
+        else if (progress >= phase * (i + 1)) newProgress[key] = 1;
+        else newProgress[key] = (progress - phase * i) / phase;
       });
+
+      setScrollProgress(newProgress);
     };
 
     window.addEventListener("scroll", handleScroll);
     handleScroll();
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, [uniformHeight]);
+
+  const sections = [
+    { key: "mine", ref: sectionRefs[0], component: <Mine /> },
+    { key: "improve", ref: sectionRefs[1], component: <Improve /> },
+    { key: "automate", ref: sectionRefs[2], component: <Automate /> },
+  ];
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full"
+      className="relative w-full bg-[#F6F6F6]"
       style={{
-        height: `${uniformHeight * 1}px`,
-        minHeight: "400vh",
+        height:
+          uniformHeight && typeof window !== "undefined"
+            ? `${uniformHeight * sections.length - window.innerHeight}px`
+            : "0px", // fallback for SSR
       }}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Mine Component */}
-        <div
-          ref={mineRef}
-          className="absolute inset-0 w-full"
-          style={{
-            transform: `translateY(${(1 - scrollProgress.mine) * 100}%)`,
-            zIndex: 1,
-            height: `${uniformHeight}px`,
-          }}
-        >
-          <Mine />
-        </div>
-
-        {/* Improve Component */}
-        <div
-          ref={improveRef}
-          className="absolute inset-0 w-full"
-          style={{
-            transform: `translateY(${(1 - scrollProgress.improve) * 100}%)`,
-            zIndex: 2,
-            height: `${uniformHeight}px`,
-          }}
-        >
-          <Improve />
-        </div>
-
-        {/* Automate Component */}
-        <div
-          ref={automateRef}
-          className="absolute inset-0 w-full"
-          style={{
-            transform: `translateY(${(1 - scrollProgress.automate) * 100}%)`,
-            zIndex: 3,
-            height: `${uniformHeight}px`,
-          }}
-        >
-          <Automate />
-        </div>
+      <div className="sticky top-40 h-screen w-full overflow-hidden">
+        {sections.map((section, i) => (
+          <div
+            key={section.key}
+            ref={section.ref}
+            className="absolute inset-0 w-full"
+            style={{
+              transform: `translateY(${(1 - scrollProgress[section.key]) * 100 * i}%)`,
+              zIndex: i + 1,
+              height: `${uniformHeight - 150}px`,
+            }}
+          >
+            {section.component}
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default ScrollStack;
+
+// transform: `translateY(${
+//   (1 - scrollProgress[section.key]) * 100 * i
+// }%)`,
