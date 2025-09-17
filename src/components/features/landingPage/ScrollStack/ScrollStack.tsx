@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 import Automate from "./Automate";
 import Improve from "./Improve";
 import Mine from "./Mine";
@@ -45,6 +47,19 @@ const ScrollStack: React.FC = () => {
     window.addEventListener("resize", measureHeights);
     return () => window.removeEventListener("resize", measureHeights);
   }, []);
+
+  useEffect(() => {
+    sections.forEach((section, i) => {
+      if (section.ref.current) {
+        gsap.to(section.ref.current, {
+          y: `${(1 - scrollProgress[section.key]) * 100 * i}%`,
+          duration: 5,
+          ease: "power4.out",
+          overwrite: true,
+        });
+      }
+    });
+  }, [scrollProgress]);
 
   // Scroll progress
   useEffect(() => {
@@ -105,8 +120,6 @@ const ScrollStack: React.FC = () => {
             ref={section.ref}
             className="absolute inset-0 w-full"
             style={{
-              transform: `translateY(${(1 - scrollProgress[section.key]) * 100 * i}%)`,
-              transition: "transform .5s ease-out",
               zIndex: i + 1,
               height: `${uniformHeight}px`,
             }}
