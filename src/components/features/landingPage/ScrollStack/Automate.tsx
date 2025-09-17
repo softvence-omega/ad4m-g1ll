@@ -11,7 +11,7 @@ const Automate: React.FC = () => {
       <div className="bg-text-secondary h-full w-full rounded-t-4xl">
         <Wrapper>
           <div className="flex w-full flex-col justify-between gap-20 py-20 xl:flex-row">
-            <div className="relative hidden h-[80dvh] w-full md:block xl:w-1/2">
+            <div className="relative hidden h-[65dvh] w-full md:block xl:w-1/2">
               <Image src={image3} alt="We Automate" fill className="rounded-xl object-cover" />
             </div>
             <div className="text-white xl:w-1/2">
