@@ -3,7 +3,6 @@ import Image from "next/image";
 import React from "react";
 import image2 from "@/../public/landingPage/img2.png";
 import Wrapper from "@/components/reusable/Wrapper";
-import ScrollButton from "@/components/reusable/ScrollButton";
 import HomeButton from "@/components/reusable/HomeButton";
 
 const Improve: React.FC = () => {
