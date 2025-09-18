@@ -2,6 +2,7 @@
 
 import HomeButton from "@/components/reusable/HomeButton";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const vdo = "/landingPage/about.mp4";
 export default function AboutSection() {
@@ -107,7 +108,10 @@ export default function AboutSection() {
           }}
           className="z-10 mt-20 justify-center md:flex xl:justify-end xl:pr-10"
         >
-          <HomeButton title="Contact" />
+          <Link href="/Contacts">
+          
+            <HomeButton title="Contact" />
+          </Link>
         </div>
       </div>
     </div>
